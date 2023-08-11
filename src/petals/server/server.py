@@ -584,12 +584,12 @@ class ModuleContainer(threading.Thread):
             self.checkpoint_saver.stop.set()
             self.checkpoint_saver.join()
 
-        logger.debug(f"Shutting down pools")
+        logger.debug("Shutting down pools")
         for pool in self.runtime.pools:
             if pool.is_alive():
                 pool.shutdown()
 
-        logger.debug(f"Shutting down runtime")
+        logger.debug("Shutting down runtime")
         self.runtime.shutdown()
 
         logger.debug("Shutting down backends")

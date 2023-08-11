@@ -61,7 +61,12 @@ def free_disk_space_for(
         return
 
     revisions = [revision for repo in model_repos for revision in repo.revisions]
-    revisions.sort(key=lambda rev: max([item.blob_last_accessed for item in rev.files], default=rev.last_modified))
+    revisions.sort(
+        key=lambda rev: max(
+            (item.blob_last_accessed for item in rev.files),
+            default=rev.last_modified,
+        )
+    )
 
     # Remove as few least recently used blocks as possible
     pending_removal = []

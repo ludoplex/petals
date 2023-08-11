@@ -186,8 +186,11 @@ class RemoteSequenceManager:
 
                 with self.lock_changes:
                     self.sequence_info.update_(new_block_infos)
-                missing_blocks = [i for i in range(len(self)) if not self.sequence_info.spans_containing_block[i]]
-                if missing_blocks:
+                if missing_blocks := [
+                    i
+                    for i in range(len(self))
+                    if not self.sequence_info.spans_containing_block[i]
+                ]:
                     raise MissingBlocksError(missing_blocks)
                 self.ready.set()  # if there is an active server for every block, we may begin running
                 break
@@ -271,9 +274,7 @@ class RemoteSequenceManager:
         return self._rpc_info
 
     def get_retry_delay(self, attempt_no: int) -> float:
-        if attempt_no == 0:
-            return 0
-        return self.min_backoff * 2 ** (attempt_no - 1)
+        return 0 if attempt_no == 0 else self.min_backoff * 2 ** (attempt_no - 1)
 
     def get_request_metadata(self, protocol: str, *args, **kwargs) -> Optional[Dict[str, Any]]:
         """

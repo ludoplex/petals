@@ -39,9 +39,12 @@ def test_full_model_exact_match(pass_empty_tensors: bool, atol_forward=1e-3, ato
             for t in range(embs.shape[1]):
                 recurrent_outputs.append(sess.step(embs[:, t : t + 1, :]))
                 if t == int(embs.shape[1] // 2) and pass_empty_tensors:
-                    recurrent_outputs.append(sess.step(torch.empty(1, 0, config.hidden_size)))
-                    recurrent_outputs.append(sess.step(torch.empty(1, 0, config.hidden_size)))
-
+                    recurrent_outputs.extend(
+                        (
+                            sess.step(torch.empty(1, 0, config.hidden_size)),
+                            sess.step(torch.empty(1, 0, config.hidden_size)),
+                        )
+                    )
         recurrent_outputs = torch.cat(recurrent_outputs, dim=1)
         recurrent_outputs = model.transformer.ln_f(recurrent_outputs)
         recurrent_outputs = model.lm_head(recurrent_outputs)
@@ -100,7 +103,7 @@ def test_greedy_generation(max_new_tokens=4):
 
 
 @pytest.mark.forked
-@pytest.mark.parametrize("sampling_options", [dict(), dict(temperature=100.0), dict(top_k=5), dict(top_p=0.9)])
+@pytest.mark.parametrize("sampling_options", [{}, dict(temperature=100.0), dict(top_k=5), dict(top_p=0.9)])
 @pytest.mark.skip("Sampling is currently not consistent with outputs from Transformers")
 def test_sampling(sampling_options, max_new_tokens=4):
     torch.manual_seed(0)

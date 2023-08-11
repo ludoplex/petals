@@ -70,7 +70,7 @@ class DummyCustomSequenceManager(RemoteSequenceManager):
         rpc_info = super().rpc_info
         dims = (2048, 1024)
         compressed_input_schema = BatchTensorDescriptor(dims, compression=runtime_pb2.CompressionType.FLOAT16)
-        rpc_info["forward_schema"] = (compressed_input_schema,), dict()  # (args, kwargs)
+        rpc_info["forward_schema"] = (compressed_input_schema,), {}
         return rpc_info
 
     def get_request_metadata(self, protocol: str, *args, **kwargs):

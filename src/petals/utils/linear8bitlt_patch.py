@@ -170,11 +170,10 @@ class CustomMatMul8bitLt(MatMul8bitLt):
                 subA = A[:, idx]
                 state.subB = B[:, idx].t().contiguous()
                 state.idx = idx
-            else:
-                if state.CxB is None and using_igemmlt:
-                    # B in in 8-bit row-major, we can transform it back to 16-bit to extract outlier dimensions
-                    # we also need to convert it to the turing/ampere format
-                    state.CxB, state.SB = F.transform(state.CB, to_order=formatB)
+            elif state.CxB is None and using_igemmlt:
+                # B in in 8-bit row-major, we can transform it back to 16-bit to extract outlier dimensions
+                # we also need to convert it to the turing/ampere format
+                state.CxB, state.SB = F.transform(state.CB, to_order=formatB)
         else:
             if not state.has_fp16_weights and state.CxB is None and using_igemmlt:
                 state.CxB, state.SB = F.transform(state.CB, to_order=formatB)
@@ -182,7 +181,7 @@ class CustomMatMul8bitLt(MatMul8bitLt):
 
         # 2. Quantize B
         if state.has_fp16_weights:
-            has_grad = True if (getattr(B, "grad", None) is not None) else False
+            has_grad = getattr(B, "grad", None) is not None
             is_transposed = not B.is_contiguous() and B.shape[0] == B.stride(1)
             if is_transposed:
                 B = B.contiguous()
