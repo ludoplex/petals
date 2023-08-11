@@ -12,8 +12,8 @@ def resolve_block_dtype(config: BloomConfig, dtype: Union[str, torch.dtype]) -> 
 
     if dtype == "auto" or dtype is None:
         dtype = config.torch_dtype
-        if dtype == "auto" or dtype is None:
-            dtype = torch.float32
+    if dtype == "auto" or dtype is None:
+        dtype = torch.float32
     return dtype
 
 
